@@ -6,7 +6,7 @@ type Client struct {
 	httpClient *http.Client
 }
 
-func newClient() *Client {
+func NewClient() *Client {
 	return &Client{
 		httpClient: &http.Client{},
 	}

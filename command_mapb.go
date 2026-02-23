@@ -6,9 +6,9 @@ import (
 	"github.com/LucasAuSilva/pokedexcli/internal/pokeapi"
 )
 
-func commandMap(config *ConfigCommand) error {
+func commandMapb(config *ConfigCommand) error {
 	pokeClient := pokeapi.NewClient()
-	res, err := pokeClient.GetLocationAreas(config.Next); if err != nil {
+	res, err := pokeClient.GetLocationAreas(config.Previous); if err != nil {
 		return fmt.Errorf("Error has occur in the API: %s", err.Error())
 	}
 	for _, location := range res.Results {
@@ -18,4 +18,3 @@ func commandMap(config *ConfigCommand) error {
 	config.Previous = res.Previous
 	return nil
 }
-
