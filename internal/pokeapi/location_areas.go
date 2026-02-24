@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"net/http"
 	"strings"
 )
 
@@ -18,20 +17,32 @@ type LocationAreaListResp struct {
 } 
 
 func (c *Client) GetLocationAreas(url *string) (LocationAreaListResp, error) {
-	var res *http.Response
-	var err error
 	var locationsArea LocationAreaListResp
+	var requestUrl string
+
 	if url == nil {
-		res, err = c.httpClient.Get("https://pokeapi.co/api/v2/location-area")
+		requestUrl = "https://pokeapi.co/api/v2/location-area"
 	} else if !strings.Contains(*url, "location-area") {
 		return locationsArea, fmt.Errorf("URL is not for location area")
 	} else {
-		res, err = c.httpClient.Get(*url)
+		requestUrl = *url
 	}
+
+	cache, exists := c.cache.Get(requestUrl); if exists {
+		err := json.Unmarshal(cache, &locationsArea)
+		if err != nil {
+			fmt.Println(err)
+			return locationsArea, err
+		}
+		return locationsArea, nil
+	}
+
+	res, err := c.httpClient.Get(requestUrl)
 	if err != nil {
 		fmt.Println("Some error has occur in the API, please try again later!")
 		return locationsArea, err
 	}
+
 	body, err := io.ReadAll(res.Body)
 	res.Body.Close()
 	if res.StatusCode > 299 {
@@ -42,6 +53,9 @@ func (c *Client) GetLocationAreas(url *string) (LocationAreaListResp, error) {
 		fmt.Println("Some error has occur, please try again later!")
 		return locationsArea, err
 	}
+
+	c.cache.Add(requestUrl, body)
+
 	err = json.Unmarshal(body, &locationsArea)
 	if err != nil {
 		fmt.Println(err)
