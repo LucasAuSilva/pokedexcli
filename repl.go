@@ -5,12 +5,16 @@ import (
 	"fmt"
 	"os"
 	"strings"
+
+	"github.com/LucasAuSilva/pokedexcli/internal/pokeapi"
 )
 
 func startRepl() {
 	commands := getCommands()
 	scanner := bufio.NewScanner(os.Stdin)
-	config := ConfigCommand{}
+	config := ConfigCommand{
+		pokeapiClient: *pokeapi.NewClient(),
+	}
 	for {
 		fmt.Print("Pokedex > ")
 		res := scanner.Scan()
@@ -22,7 +26,11 @@ func startRepl() {
 			}
 			cleanInputs := cleanInput(input)
 			if command, exists := commands[cleanInputs[0]]; exists {
-				command.callback(&config)
+				config.parameters = cleanInputs
+				err := command.callback(&config)
+				if err != nil {
+					fmt.Println(err.Error())
+				}
 			} else {
 				fmt.Println("Unknown command.")
 			}
@@ -37,8 +45,10 @@ func cleanInput(text string) []string {
 }
 
 type ConfigCommand struct {
-	Next 		 *string
-	Previous *string
+	pokeapiClient pokeapi.Client
+	parameters   	[]string
+	NextURL 		 	*string
+	PreviousURL  	*string
 }
 
 type CliCommand struct {
@@ -68,6 +78,11 @@ func getCommands() map[string]CliCommand {
 			name: 			 "map",
 			description: "Display the previous 20 locations areas of Pokemon World",
 			callback: 	 commandMapb,
+		},
+		"explore": {
+			name: 			 "map",
+			description: "Use to see all the pokemon on an given area",
+			callback: 	 commandExplore,
 		},
 	}
 }
