@@ -14,6 +14,7 @@ func startRepl() {
 	scanner := bufio.NewScanner(os.Stdin)
 	config := ConfigCommand{
 		pokeapiClient: *pokeapi.NewClient(),
+		userPokemons: make(map[string]pokeapi.PokemonResp),
 	}
 	for {
 		fmt.Print("Pokedex > ")
@@ -46,6 +47,7 @@ func cleanInput(text string) []string {
 
 type ConfigCommand struct {
 	pokeapiClient pokeapi.Client
+	userPokemons map[string]pokeapi.PokemonResp
 	parameters   	[]string
 	NextURL 		 	*string
 	PreviousURL  	*string
@@ -75,14 +77,19 @@ func getCommands() map[string]CliCommand {
 			callback: 	 commandMap,
 		},
 		"mapb": {
-			name: 			 "map",
+			name: 			 "mapb",
 			description: "Display the previous 20 locations areas of Pokemon World",
 			callback: 	 commandMapb,
 		},
 		"explore": {
-			name: 			 "map",
+			name: 			 "explore",
 			description: "Use to see all the pokemon on an given area",
 			callback: 	 commandExplore,
+		},
+		"catch": {
+			name: 			 "catch",
+			description: "Command for you to try to catch an pokemon and add to your pokedex",
+			callback: 	 commandCatch,
 		},
 	}
 }

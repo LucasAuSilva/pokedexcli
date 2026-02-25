@@ -5,6 +5,10 @@ import (
 )
 
 func commandExplore(config *ConfigCommand) error {
+	if len(config.parameters) < 2 {
+			return fmt.Errorf("usage: explore <location>")
+	}
+
 	pokeClient := config.pokeapiClient
 	res, err := pokeClient.LocationAreaPerCity(&config.parameters[1]); if err != nil {
 		return fmt.Errorf("Error has occur in the API: %s", err.Error())

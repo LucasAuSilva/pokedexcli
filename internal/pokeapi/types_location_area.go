@@ -16,10 +16,9 @@ type LocationAreaCityResp struct {
 }
 
 type PokemonEncountersResp struct {
-	Pokemon PokemonResp `json:"pokemon"` 
+	Pokemon struct {
+		Name *string `json:"name"`
+		Url  *string `json:"url"`
+	} `json:"pokemon"` 
 }
 
-type PokemonResp struct {
-	Name *string `json:"name"`
-	Url  *string `json:"url"`
-}
